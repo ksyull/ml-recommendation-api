@@ -2,17 +2,14 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY . .
 
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir fastapi uvicorn[standard]
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir fastapi uvicorn[standard] && \
+    pip install --no-cache-dir -r requirements.txt
 
-COPY app/ ./app/
-
-RUN mkdir -p /app/app/models
+RUN chmod +x /app/start.sh 2>/dev/null || true
 
 ENV PORT=8080
-ENV MODEL_PATH=/app/app/models/recommendation_model.pkl
 
-CMD ["/usr/local/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
